@@ -1,0 +1,38 @@
+{% extends 'service/base.html'%}
+{% load static %}
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+
+          </div>
+   <h1 class="display-4" >Пользователи</h1>
+</div>
+ <div class="album py-5 bg-light">
+        <div class="container">
+
+          <div class="row">
+            {% for object in object_list %}
+            <div class="col-md-4">
+              <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                   <p class="card-text">{{ object.email |title }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                         <a href="{% url 'users:user_view' object.pk %}">
+                      <button type="button" class="btn btn-sm btn-outline-primary">View</button></a>
+                        <a href="{% url 'users:user_delete' object.pk %}">
+                        <button type="button" class="btn  btn-sm btn-outline-danger">Delete</button></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+
+
+    {% endblock %}
+

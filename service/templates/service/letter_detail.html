@@ -1,0 +1,60 @@
+{% extends 'service/base.html'%}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card header">
+                        <h3 class="card-title">
+                            Информация о подписке
+                        </h3>
+                    </div>
+                    <div class="card body">
+                        <table class="table">
+                            <tr>
+                                <td Информация о рассылке ></td>
+                            </tr>
+                              <tr>
+                                  <tr>
+                                <td>Название: {{ object.name }}</td>
+                             </tr>
+                             <tr>
+                                <td>Автор рассылки: {{ object.author }}</td>
+                             </tr>
+                                <td> Отправление с: {{ object.time_on }}</td>
+                              </tr>
+                            <tr>
+                                <td> Отправление до: {{ object.time_off }}</td>
+                              </tr>
+                             <tr>
+                                <td>Переодинчость: {{ object.periodicity }}</td>
+                             </tr>
+                            <tr>
+                                <td>Статус: {{ object.status }}</td>
+                             </tr>
+                            <tr>
+                                <td>Клиенты рассылки: {{ object.clients }}</td>
+                             </tr>
+
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
