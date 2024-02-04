@@ -39,10 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'service',
+
     'users',
     'blog',
     'django_celery_beat',
+    'service'
+
+
 
 
 
@@ -84,7 +87,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'term1',
+        'NAME': 'term2',
         'USER': 'postgres',
         'PASSWORD': '12345',
         'PORT': 5432

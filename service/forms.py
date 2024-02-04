@@ -25,7 +25,7 @@ class СustomerForm(StyleFormMixin, forms.ModelForm):
 class LetterForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Letter
-        fields = ('name', 'time_on', 'time_off', 'periodicity', 'clients', 'status',)
+        fields = ('name',  'periodicity', 'clients', )
 
 
 class MessageForm(StyleFormMixin, forms.ModelForm):

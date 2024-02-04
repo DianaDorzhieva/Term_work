@@ -19,36 +19,14 @@ class Сustomer(models.Model):
         verbose_name_plural = 'клиенты'
 
 
-class Message(models.Model):
-    title = models.CharField(max_length=100, verbose_name='тема письма')
-    message = models.TextField(verbose_name='тело письма')
-    user_for = models.ForeignKey(Сustomer, on_delete=models.CASCADE,
-                                 verbose_name='получатель сообщения', **NULLABLE)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = 'сообщение'
-        verbose_name_plural = 'сообщения'
-
-
 class Letter(models.Model):
-    day = "раз в день"
-    week = "раз в неделю"
-    month = "раз в месяц"
 
-    CREATED = 'Создана'
-    STARTED = 'Запущена'
-    COMPLETED = 'Завершена'
+    choice_periodicity = [('day', "раз в день"), ('week', "раз в неделю"), ('month', "раз в месяц")]
+    choice_status = [('CREATED', "создана"), ('STARTED', "запущена"), ('COMPLETED', "завершена")]
 
-    choice_periodicity = [(day, "раз в день"), (week, "раз в неделю"), (month, "раз в месяц")]
-    choice_status = [(CREATED, "создана"), (STARTED, "запущена"), (COMPLETED, "завершена")]
-    time_on = models.TimeField(verbose_name='время рассылки от')
-    time_off = models.TimeField(verbose_name='время рассылки до')
-    time = models.TimeField(verbose_name='Время рассылки', **NULLABLE)
-    finish_date = models.DateField(verbose_name='Дата завершения рассылки', default='2024-01-01')
-    finish_time = models.TimeField(verbose_name='Время завершения рассылки', default='00:00')
+    time = models.TimeField(verbose_name='Время рассылки', **NULLABLE, auto_now_add=True,)
+    finish_date = models.DateField(verbose_name='Дата завершения рассылки', **NULLABLE)
+    finish_time = models.TimeField(verbose_name='Время завершения рассылки', **NULLABLE)
     periodicity = models.CharField(max_length=100, verbose_name='переодичность рассылки',
                                    choices=choice_periodicity)
     status = models.CharField(max_length=100, verbose_name='статус рассылки', choices=choice_status)
@@ -57,12 +35,10 @@ class Letter(models.Model):
     is_active = models.BooleanField(verbose_name='активность рассылки', default=True)
     author = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name='Автор',
                                **NULLABLE)
-    message = models.ForeignKey(Message, on_delete=models.CASCADE, verbose_name='сообщение',
-                                **NULLABLE)
     create_date = models.DateField(auto_now_add=True, verbose_name='Дата создания', **NULLABLE)
 
     def __str__(self):
-        return self.time_on, self.time_off
+        return self.name
 
     class Meta:
         verbose_name = 'рассылка'
@@ -72,9 +48,28 @@ class Letter(models.Model):
             ('can_change_is_active_permission', 'Can change active latter'),
         ]
 
+    def delete(self, *args, **kwargs):
+        self.is_active = False
+        self.status = 'COMPLETED'
+        self.save()
+
+
+class Message(models.Model):
+    title = models.CharField(max_length=100, verbose_name='тема письма')
+    text = models.TextField(verbose_name='тело письма', **NULLABLE)
+    message = models.ForeignKey(Letter, on_delete=models.CASCADE,
+                                verbose_name='настройка сообщения', **NULLABLE)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'сообщение'
+        verbose_name_plural = 'сообщения'
+
 
 class Logs(models.Model):
-    data_time = models.DateTimeField(verbose_name='Дата и время отправки', **NULLABLE)
+    data_time = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время отправки')
     status = models.CharField(max_length=100, verbose_name='статус попытки')
     answer = models.BooleanField(verbose_name='ответ почтового сервера')
 

@@ -2,6 +2,7 @@
     {% if user.is_authenticated %}
         <a class="p-2 btn btn-outline-dark" href="{% url 'users:profile' %}">Профиль</a>
         <a class="p-2 btn btn-outline-dark" href="{% url 'users:logout' %}">Выход</a>
+         <a class="p-2 btn btn-outline-dark" href="{% url 'service:logs_list' %}">Главная</a>
     <a class="p-2 btn btn-outline-dark" href="{% url 'users:user_list' %}">Пользователи зарегестрированные</a>
     <a class="p-2 btn btn-outline-dark" href="{% url 'service:list' %}">Клиенты сервиса</a>
      <a class="p-2 btn btn-outline-dark" href="{% url 'service:list_letter' %}">Подписки</a>

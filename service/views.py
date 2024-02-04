@@ -14,7 +14,7 @@ from service.forms import СustomerForm, LetterForm, MessageForm
 from django.forms import inlineformset_factory
 
 from service.service import MessageService, get_count_mailing, get_active_mailing, \
-    get_unique_clients
+    get_unique_clients, delete_task, send_mailing
 
 
 class СustomerListView(LoginRequiredMixin, ListView):
@@ -84,6 +84,15 @@ class LetterCreateView(LoginRequiredMixin, CreateView):
     form_class = LetterForm
     success_url = reverse_lazy('service:list_letter')
 
+    def get_queryset(self):
+        user = self.request.author
+        mailing = Letter.objects.all()
+        if user.is_staff or user.is_superuser:
+            queryset = mailing
+        else:
+            queryset = mailing.clients.filter(user=user)
+        return queryset
+
     def form_valid(self, form):
         mail = form.save(commit=False)
         mail.author = self.request.user
@@ -91,7 +100,7 @@ class LetterCreateView(LoginRequiredMixin, CreateView):
         mail.save()
 
         message_service = MessageService(mail)
-        message_service.send_mailing(mail)
+        send_mailing(mail)
         message_service.create_task()
         mail.status = 'STARTED'
         mail.save()
@@ -150,6 +159,21 @@ class LetterDeleteView(LoginRequiredMixin, DeleteView):
             raise Http404("Вы не можете удалить чужую подписку")
         return self.object
 
+    def toggle_status(request, pk):
+        """Функция, позволяющая отключать и активировать рассылку"""
+        mailing = get_object_or_404(Letter, pk=pk)
+        message_service = MessageService(mailing)
+        if mailing.status == 'STARTED' or mailing.status == 'CREATED':
+            delete_task(mailing)
+            mailing.status = 'COMPLETED'
+        else:
+            message_service.create_task()
+            mailing.status = 'STARTED'
+
+        mailing.save()
+
+        return redirect(reverse('service:list_letter'))
+
 
 
 
@@ -174,17 +198,4 @@ class HomeView(TemplateView):
 
 
 
-def toggle_status(request, pk):
-    """Функция, позволяющая отключать и активировать рассылку"""
-    mailing = get_object_or_404(Letter, pk=pk)
-    message_service = MessageService(mailing)
-    if mailing.status == 'STARTED' or mailing.status == 'CREATED':
-        message_service.delete_task(mailing)
-        mailing.status = 'COMPLETED'
-    else:
-        message_service.create_task()
-        mailing.status = 'STARTED'
 
-    mailing.save()
-
-    return redirect(reverse('service:list_letter'))

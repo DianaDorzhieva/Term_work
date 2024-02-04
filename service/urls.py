@@ -2,7 +2,7 @@ from django.urls import path
 from service.apps import ServiceConfig
 from service.views import СustomerListView, СustomerCreateView, СustomerDetailView, \
     СustomerUpdateView, СustomerDeleteView, LetterListView, LetterCreateView, LetterDetailView, \
-    LetterUpdateView, LetterDeleteView, HomeView, toggle_status
+    LetterUpdateView, LetterDeleteView, HomeView
 
 app_name = ServiceConfig.name
 
@@ -18,6 +18,5 @@ urlpatterns = [
     path('letter/edit/<int:pk>/', LetterUpdateView.as_view(), name='edit_letter'),
     path('letter/delete/<int:pk>/', LetterDeleteView.as_view(), name='delete_letter'),
     path('', HomeView.as_view(), name='logs_list'),
-    path('toggle/<int:pk>/', toggle_status, name='toggle_status')
 
 ]
