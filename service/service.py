@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-from service.models import Logs, Letter, Сustomer
+from service.models import Logs, Letter, Сustomer, Message
 from datetime import datetime
 
 
@@ -61,32 +61,38 @@ def delete_task(mailing):
 
 def send_mailing(mailing):
         """Отправка рассылки и создание лога рассылки"""
-        message = mailing.name
-        clients = mailing.clients.all()
-        for client in clients:
-            try:
-                send_mail(
-                    subject=message.title,
-                    message=message.text,
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[client.email]
-                )
-                mailing_log = Logs(
-                    data_time=datetime.now(),
-                    status='Success',
-                    answer=True,
-                    mailing_list=mailing,
-                )
-                mailing_log.save()
+        message = Message.objects.filter(message=mailing)
+        if message:
+            message = message[0]
+            print(message.__dict__)
+            clients = mailing.clients.all()
+            for client in clients:
+                try:
+                    send_mail(
+                        subject=message.title,
+                        message=message.text,
+                        from_email=settings.EMAIL_HOST_USER,
+                        recipient_list=[client.email]
+                    )
+                    mailing_log = Logs(
+                        data_time=datetime.now(),
+                        status='Success',
+                        answer=True,
+                        mailing_list=mailing,
+                    )
+                    mailing_log.save()
+                    print(mailing_log)
+                    print(mailing_log.__dict__)
 
-            except Exception:
-                mailing_log = Logs(
-                    data_time=datetime.now(),
-                    status='Failure',
-                    answer=False,
-                    mailing_list=mailing,
-                )
-                mailing_log.save()
+                except Exception as e:
+                    mailing_log = Logs(
+                        data_time=datetime.now(),
+                        status='Failure',
+                        answer=False,
+                        mailing_list=mailing,
+                    )
+                    mailing_log.save()
+                    print(e)
 
 def get_count_mailing():
         """Возвращает количество рассылок всего"""
